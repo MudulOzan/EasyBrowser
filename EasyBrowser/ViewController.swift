@@ -14,6 +14,7 @@ class ViewController: UIViewController, WKNavigationDelegate {
     var webSites = ["apple.com", "google.com", "wikipedia.org"]
     var forwardButton: UIBarButtonItem!
     var backwardButton: UIBarButtonItem!
+    var selectedSite: String!
     
     override func loadView() {
         webView = WKWebView()
@@ -24,32 +25,35 @@ class ViewController: UIViewController, WKNavigationDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Open", style: .plain, target: self, action: #selector(openTapped))
-        
-        let spacer = UIBarButtonItem(systemItem: .flexibleSpace)
-        let refresh = UIBarButtonItem(barButtonSystemItem: .refresh, target: webView, action: #selector(webView.reload))
-        forwardButton = UIBarButtonItem(image: UIImage(systemName: "chevron.forward"), style: .plain, target: webView, action: #selector(webView.goForward))
-        backwardButton = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: webView, action: #selector(webView.goBack))
-        
-        
-        forwardButton.isEnabled = webView.canGoForward
-        backwardButton.isEnabled = webView.canGoBack
-        
-        progressView = UIProgressView(progressViewStyle: .default)
-        progressView.sizeToFit()
-        let progressButton = UIBarButtonItem(customView: progressView)
-        
-        toolbarItems = [backwardButton, forwardButton, progressButton, spacer, refresh]
-        navigationController?.isToolbarHidden = false
-        
-        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
-        webView.addObserver(self, forKeyPath: "URL", options: .new, context: nil)
-        
-        let url = URL(string: "https://\(webSites[0])")!
-        webView.load(URLRequest(url: url))
-        webView.allowsBackForwardNavigationGestures = true
-        
+        if let siteToLoad = selectedSite {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Open", style: .plain, target: self, action: #selector(openTapped))
+            
+            
+            let spacer = UIBarButtonItem(systemItem: .flexibleSpace)
+            let refresh = UIBarButtonItem(barButtonSystemItem: .refresh, target: webView, action: #selector(webView.reload))
+            forwardButton = UIBarButtonItem(image: UIImage(systemName: "chevron.forward"), style: .plain, target: webView, action: #selector(webView.goForward))
+            backwardButton = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: webView, action: #selector(webView.goBack))
+            
+            
+            forwardButton.isEnabled = webView.canGoForward
+            backwardButton.isEnabled = webView.canGoBack
+            
+            progressView = UIProgressView(progressViewStyle: .default)
+            progressView.sizeToFit()
+            let progressButton = UIBarButtonItem(customView: progressView)
+            
+            toolbarItems = [backwardButton, forwardButton, progressButton, spacer, refresh]
+            navigationController?.isToolbarHidden = false
+            
+            webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
+            webView.addObserver(self, forKeyPath: "URL", options: .new, context: nil)
+            
+            
+            
+            let url = URL(string: "https://\(siteToLoad)")!
+            webView.load(URLRequest(url: url))
+            webView.allowsBackForwardNavigationGestures = true
+        }
     }
     
     @objc func openTapped() {
